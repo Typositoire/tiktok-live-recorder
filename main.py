@@ -61,6 +61,10 @@ def parse_args():
                         dest="auto_convert",
                         help="enable auto video conversion [Default: False]",
                         action='store_true')
+    parser.add_argument("--mattermost-webhook",
+                        dest="mattermost_webhook",
+                        help="send notifications to mattermost webhook integration",
+                        action='store')
 
     args = parser.parse_args()
     return args
@@ -116,6 +120,7 @@ def main():
             use_ffmpeg = True
         elif mode == Mode.AUTOMATIC:
             raise Exception("To use automatic mode, add -ffmpeg flag.")
+        
     except Exception as ex:
         logger.error(f"\n{ex}")
         exit(1)
@@ -131,7 +136,8 @@ def main():
             room_id=room_id,
             use_ffmpeg=use_ffmpeg,
             duration=args.duration,
-            convert=args.auto_convert
+            convert=args.auto_convert,
+            mattermost_webhook=args.mattermost_webhook,
         )
         bot.run()
     except Exception as ex:
