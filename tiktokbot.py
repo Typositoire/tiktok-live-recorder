@@ -15,7 +15,7 @@ from httpclient import HttpClient
 class TikTok:
 
     def __init__(self, httpclient, output, mode, logger, url=None, user=None, room_id=None, use_ffmpeg=None, duration=None,
-                 convert=False):
+                 convert=False, mattermost_webhook=None):
         self.output = output
         self.url = url
         self.user = user
@@ -25,6 +25,7 @@ class TikTok:
         self.duration = duration
         self.convert = convert
         self.logger = logger
+        self.mattermost_webhook = mattermost_webhook
 
         if httpclient is not None:
             self.httpclient: Session = httpclient.req
@@ -73,7 +74,8 @@ class TikTok:
                     self.logger.info(f"waiting {TimeOut.AUTOMATIC_MODE} minutes before recheck\n")
                     time.sleep(TimeOut.AUTOMATIC_MODE * TimeOut.ONE_MINUTE)
                     continue
-
+            
+                self.notify_webhook()
                 self.start_recording()
 
     def convertion_mp4(self, file):
@@ -87,6 +89,18 @@ class TikTok:
             self.logger.info("Finished converting {}".format(file))
         except FileNotFoundError:
             self.logger.error("FFmpeg is not installed.")
+
+    def notify_mattermost(self):
+        """
+        Send a webhook notification to mattermost
+        """
+
+        if self.mattermost_webhook is None:
+            self.logger.info("No url to notify was defined.")
+        else:
+            headers = {'Content-Type': 'application/json',}
+            values = '{ "text": "User '+str(self.user)+' is now live!"}'
+            response = req.post(self.mattermost_webhook, headers=headers, data=values) 
 
     def start_recording(self):
         """
