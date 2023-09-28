@@ -59,6 +59,10 @@ class TikTok:
         If the mode is AUTOMATIC, it continuously checks if the user is live and if not, waits for the specified timeout before rechecking.
         If the user is live, it starts recording.
         """
+
+        if self.mattermost_webhook is not None:
+            self.logger.info("Notifications will be sent to " + self.mattermost_webhook)
+
         if self.mode == Mode.MANUAL:
             if not self.is_user_in_live():
                 self.logger.info(f"{self.user} is offline\n")
