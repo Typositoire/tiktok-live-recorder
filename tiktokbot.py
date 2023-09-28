@@ -75,7 +75,7 @@ class TikTok:
                     time.sleep(TimeOut.AUTOMATIC_MODE * TimeOut.ONE_MINUTE)
                     continue
             
-                self.notify_webhook()
+                self.notify_mattermost()
                 self.start_recording()
 
     def convertion_mp4(self, file):
