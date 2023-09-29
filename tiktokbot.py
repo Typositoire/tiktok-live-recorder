@@ -3,6 +3,7 @@ import re
 import sys
 import time
 
+import json
 import ffmpeg
 import requests as req
 from requests import Session
@@ -204,7 +205,11 @@ class TikTok:
             url = f"https://www.tiktok.com/api/live/detail/?aid=1988&roomID={self.room_id}"
             content = self.httpclient.get(url).text
 
-            return '"status":4' not in content
+            json_content = json.loads(content)
+
+            self.logger.info("Status: " + str(json_content["LiveRoomInfo"]["status"]))
+
+            return json_content["LiveRoomInfo"]["status"] != 4
         except ConnectionAbortedError:
             if self.mode == Mode.MANUAL:
                 self.logger.error(Error.CONNECTION_CLOSED)
